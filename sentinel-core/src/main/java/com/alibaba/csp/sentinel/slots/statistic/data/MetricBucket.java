@@ -26,11 +26,21 @@ import com.alibaba.csp.sentinel.slots.statistic.base.LongAdder;
  * @author Eric Zhao
  */
 public class MetricBucket {
-
+    //指标数据存在LongAdder[] counters中。
+    //LongAdder是JDK1.8中新增的类，用于在高并发场景下代替AtomicLong，以用空间换时间的方式降低了CAS失败的概率，从而提高性能
+    /**
+     * 存储指标的计数器
+     * counters[0] PASS 通过数
+     * counters[1] BLOCK 拒绝数
+     * counters[2] EXCEPTION 异常数
+     * counters[3] SUCCESS 成功数
+     * counters[4] RT 响应时长
+     * counters[5] OCCUPIED_PASS 预分配通过数
+     */
     private final LongAdder[] counters;
-
+    //最小RT
     private volatile long minRt;
-
+    //在构造方法中初始化
     public MetricBucket() {
         MetricEvent[] events = MetricEvent.values();
         this.counters = new LongAdder[events.length];
@@ -39,7 +49,7 @@ public class MetricBucket {
         }
         initMinRt();
     }
-
+    //覆盖指标
     public MetricBucket reset(MetricBucket bucket) {
         for (MetricEvent event : MetricEvent.values()) {
             counters[event.ordinal()].reset();
@@ -55,7 +65,7 @@ public class MetricBucket {
 
     /**
      * Reset the adders.
-     *
+     * 重置指标为0
      * @return new metric bucket in initial state
      */
     public MetricBucket reset() {
@@ -65,11 +75,11 @@ public class MetricBucket {
         initMinRt();
         return this;
     }
-
+    //获取指标值，从counters中返回
     public long get(MetricEvent event) {
         return counters[event.ordinal()].sum();
     }
-
+    //获取指标值，从counters中返回
     public MetricBucket add(MetricEvent event, long n) {
         counters[event.ordinal()].add(n);
         return this;

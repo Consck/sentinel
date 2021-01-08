@@ -215,9 +215,9 @@ public final class SpiLoader {
 
     /**
      * Load the sorted and prototype SPI instance list for provided SPI interface.
-     *
+     * 为提供的SPI接口加载已排序的和原型的SPI实例列表。
      * Note: each call return different instances, i.e. prototype instance, not singleton instance.
-     *
+     * 注意:每个调用返回不同的实例，即原型实例，而不是单例实例。
      * @param clazz class of the SPI
      * @param <T>   SPI type
      * @return sorted and different SPI instance list

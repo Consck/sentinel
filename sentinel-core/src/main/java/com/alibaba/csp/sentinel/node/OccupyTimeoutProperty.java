@@ -30,6 +30,7 @@ public class OccupyTimeoutProperty {
      * <p>
      * Max occupy timeout in milliseconds. Requests with priority can occupy tokens of the future statistic
      * window, and {@code occupyTimeout} limit the max time length that can be occupied.
+     * Max占用超时时间(毫秒)。具有优先级的请求可以占用未来统计窗口的令牌，并且{@code occupyTimeout}限制可以占用的最大时间长度。
      * </p>
      * <p>
      * Note that the timeout value should never be greeter than {@link IntervalProperty#INTERVAL}.
@@ -51,6 +52,7 @@ public class OccupyTimeoutProperty {
     }
 
     public static int getOccupyTimeout() {
+        //可以占用的最大时间长度
         return occupyTimeout;
     }
 

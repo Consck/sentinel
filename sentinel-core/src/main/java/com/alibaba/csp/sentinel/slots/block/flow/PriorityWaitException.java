@@ -17,6 +17,7 @@ package com.alibaba.csp.sentinel.slots.block.flow;
 
 /**
  * An exception that marks previous prioritized request has been waiting till now, then should pass.
+ * 标记先前优先级请求的异常一直等待到现在，然后应该通过。
  *
  * @author jialiang.linjl
  * @since 1.5.0

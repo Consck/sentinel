@@ -29,7 +29,7 @@ import com.alibaba.csp.sentinel.spi.SpiOrder;
 
 /**
  * A {@link ProcessorSlot} dedicates to circuit breaking.
- *
+ * 服务降级，会根据用户配置的降级规则和系统运行时各个Node中的统计数据进行降级判断
  * @author Carpenter Lee
  * @author Eric Zhao
  */
@@ -39,16 +39,19 @@ public class DegradeSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
     @Override
     public void entry(Context context, ResourceWrapper resourceWrapper, DefaultNode node, int count,
                       boolean prioritized, Object... args) throws Throwable {
+        //降级检查
         performChecking(context, resourceWrapper);
-
+        //调用下一个Slot
         fireEntry(context, resourceWrapper, node, count, prioritized, args);
     }
 
     void performChecking(Context context, ResourceWrapper r) throws BlockException {
+        //根据资源名称得到降级规则表
         List<CircuitBreaker> circuitBreakers = DegradeRuleManager.getCircuitBreakers(r.getName());
         if (circuitBreakers == null || circuitBreakers.isEmpty()) {
             return;
         }
+        //循环判断每个规则
         for (CircuitBreaker cb : circuitBreakers) {
             if (!cb.tryPass(context)) {
                 throw new DegradeException(cb.getRule().getLimitApp(), cb.getRule());

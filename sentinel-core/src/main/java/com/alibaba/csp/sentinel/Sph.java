@@ -22,7 +22,7 @@ import com.alibaba.csp.sentinel.slots.system.SystemRule;
 
 /**
  * The basic interface for recording statistics and performing rule checking for resources.
- *
+ * 用于记录统计信息和执行资源规则检查的基本接口。
  * @author qinan.qn
  * @author jialiang.linjl
  * @author leyou
@@ -32,7 +32,7 @@ public interface Sph extends SphResourceTypeSupport {
 
     /**
      * Record statistics and perform rule checking for the given resource.
-     *
+     * 记录统计信息并执行给定资源的规则检查。
      * @param name the unique name of the protected resource
      * @return the {@link Entry} of this invocation (used for mark the invocation complete and get context data).
      * @throws BlockException if the block criteria is met
@@ -41,7 +41,7 @@ public interface Sph extends SphResourceTypeSupport {
 
     /**
      * Record statistics and perform rule checking for the given method.
-     *
+     * 记录统计信息并执行给定方法的规则检查。
      * @param method the protected method
      * @return the {@link Entry} of this invocation (used for mark the invocation complete and get context data).
      * @throws BlockException if the block criteria is met
@@ -50,7 +50,7 @@ public interface Sph extends SphResourceTypeSupport {
 
     /**
      * Record statistics and perform rule checking for the given method.
-     *
+     * 记录统计信息并执行给定方法的规则检查。
      * @param method     the protected method
      * @param batchCount the amount of calls within the invocation (e.g. batchCount=2 means request for 2 tokens)
      * @return the {@link Entry} of this invocation (used for mark the invocation complete and get context data).
@@ -148,7 +148,7 @@ public interface Sph extends SphResourceTypeSupport {
 
     /**
      * Create a protected asynchronous resource.
-     *
+     * 创建一个受保护的异步资源。
      * @param name        the unique name for the protected resource
      * @param trafficType the traffic type (inbound, outbound or internal). This is used
      *                    to mark whether it can be blocked when the system is unstable,
@@ -163,7 +163,7 @@ public interface Sph extends SphResourceTypeSupport {
 
     /**
      * Create a protected resource with priority.
-     *
+     * 创建具有优先级的受保护资源。
      * @param name        the unique name for the protected resource
      * @param trafficType the traffic type (inbound, outbound or internal). This is used
      *                    to mark whether it can be blocked when the system is unstable,
@@ -179,7 +179,7 @@ public interface Sph extends SphResourceTypeSupport {
 
     /**
      * Create a protected resource with priority.
-     *
+     * 创建具有优先级的受保护资源。
      * @param name        the unique name for the protected resource
      * @param trafficType the traffic type (inbound, outbound or internal). This is used
      *                    to mark whether it can be blocked when the system is unstable,

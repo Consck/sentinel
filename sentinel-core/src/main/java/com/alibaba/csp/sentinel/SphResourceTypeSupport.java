@@ -26,7 +26,7 @@ public interface SphResourceTypeSupport {
 
     /**
      * Record statistics and perform rule checking for the given resource with provided classification.
-     *
+     * 记录统计信息，并使用提供的分类对给定资源执行规则检查。
      * @param name         the unique name of the protected resource
      * @param resourceType the classification of the resource
      * @param trafficType  the traffic type (inbound, outbound or internal). This is used
@@ -42,7 +42,7 @@ public interface SphResourceTypeSupport {
 
     /**
      * Record statistics and perform rule checking for the given resource with the provided classification.
-     *
+     * 使用提供的分类记录统计信息并对给定资源执行规则检查。
      * @param name         the unique name of the protected resource
      * @param resourceType classification of the resource (e.g. Web or RPC)
      * @param trafficType  the traffic type (inbound, outbound or internal). This is used
@@ -59,7 +59,7 @@ public interface SphResourceTypeSupport {
 
     /**
      * Record statistics and perform rule checking for the given resource that indicates an async invocation.
-     *
+     * 记录统计信息，并对指示异步调用的给定资源执行规则检查。
      * @param name         the unique name for the protected resource
      * @param resourceType classification of the resource (e.g. Web or RPC)
      * @param trafficType  the traffic type (inbound, outbound or internal). This is used

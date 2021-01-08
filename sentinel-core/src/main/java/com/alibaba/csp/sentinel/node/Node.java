@@ -126,6 +126,7 @@ public interface Node extends OccupySupport, DebugSupport {
 
     /**
      * Get current active thread count.
+     * 获取当前活动线程计数。
      *
      * @return current active thread count
      */

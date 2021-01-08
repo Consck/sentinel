@@ -25,6 +25,7 @@ import com.alibaba.csp.sentinel.slots.statistic.StatisticSlotCallbackRegistry;
  *
  * @author Carpenter Lee
  * @since 1.6.1
+ * 初始化函数
  */
 public class MetricCallbackInit implements InitFunc {
     @Override

@@ -310,9 +310,11 @@ public abstract class AbstractSentinelAspectSupport {
     }
 
     protected Method resolveMethod(ProceedingJoinPoint joinPoint) {
+        //注解所在的方法
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();
+        //注解所在的类位置
         Class<?> targetClass = joinPoint.getTarget().getClass();
-
+        //类名、方法名、方法入参类型，返回声明方法信息
         Method method = getDeclaredMethodFor(targetClass, signature.getName(),
             signature.getMethod().getParameterTypes());
         if (method == null) {
@@ -323,6 +325,7 @@ public abstract class AbstractSentinelAspectSupport {
 
     /**
      * Get declared method with provided name and parameterTypes in given class and its super classes.
+     * 使用给定类及其超类中提供的名称和参数类型声明方法。
      * All parameters should be valid.
      *
      * @param clazz          class where the method is located

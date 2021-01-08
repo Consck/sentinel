@@ -61,27 +61,46 @@ public class FlowRuleChecker {
         return canPassCheck(rule, context, node, acquireCount, false);
     }
 
+    /**
+     * canPassCheck方法提供了集群和单机两种限流模式，单机限流是本机独立完成的，不需要依赖集群环境。
+     * 单机限流的实现调用的是passLocalCheck,它主要有两个逻辑：
+     * 第一步：根据来源和策略获取Node,从而拿到统计的runtime信息
+     * 第二步：使用流量控制器检查是否让流量通过
+     * @param rule
+     * @param context
+     * @param node
+     * @param acquireCount
+     * @param prioritized
+     * @return
+     */
     public boolean canPassCheck(/*@NonNull*/ FlowRule rule, Context context, DefaultNode node, int acquireCount,
                                                     boolean prioritized) {
         String limitApp = rule.getLimitApp();
         if (limitApp == null) {
             return true;
         }
-
+        //集群模式
         if (rule.isClusterMode()) {
             return passClusterCheck(rule, context, node, acquireCount, prioritized);
         }
-
+        //单机模式
         return passLocalCheck(rule, context, node, acquireCount, prioritized);
     }
 
     private static boolean passLocalCheck(FlowRule rule, Context context, DefaultNode node, int acquireCount,
                                           boolean prioritized) {
+        //selectNodeByRequesterAndStrategy根据FlowRule中配置的Strategy和limitApp属性，返回不同处理策略的Node
         Node selectedNode = selectNodeByRequesterAndStrategy(rule, context, node);
         if (selectedNode == null) {
             return true;
         }
-
+        /**
+         * 通过rule.getRater()获得流控行为，实现不同的处理策略
+         * DefaultController：直接拒绝
+         * RateLimiterController：匀速排队
+         * WarmUpController：冷启动
+         * WarmUpRateLimiterController：匀速+冷启动
+         */
         return rule.getRater().canPass(selectedNode, acquireCount, prioritized);
     }
 
@@ -119,6 +138,7 @@ public class FlowRuleChecker {
         String origin = context.getOrigin();
 
         if (limitApp.equals(origin) && filterOrigin(origin)) {
+            //场景1：限流规则设置了具体应用，如果当前流量就是通过该应用的，则命中场景1
             if (strategy == RuleConstant.STRATEGY_DIRECT) {
                 // Matches limit origin, return origin statistic node.
                 return context.getOriginNode();
@@ -126,6 +146,7 @@ public class FlowRuleChecker {
 
             return selectReferenceNode(rule, context, node);
         } else if (RuleConstant.LIMIT_APP_DEFAULT.equals(limitApp)) {
+            //场景2：限流规则未指定任何具体应用，默认为default，则当前流量直接命中场景2
             if (strategy == RuleConstant.STRATEGY_DIRECT) {
                 // Return the cluster node.
                 return node.getClusterNode();
@@ -134,13 +155,22 @@ public class FlowRuleChecker {
             return selectReferenceNode(rule, context, node);
         } else if (RuleConstant.LIMIT_APP_OTHER.equals(limitApp)
             && FlowRuleManager.isOtherOrigin(origin, rule.getResource())) {
+            //场景3：限流规则设置的是other，当前流量未命中前两种场景
             if (strategy == RuleConstant.STRATEGY_DIRECT) {
                 return context.getOriginNode();
             }
 
             return selectReferenceNode(rule, context, node);
         }
-
+        /**
+         * 假设我们对接口UseService配置限流1000QPS，这3种场景分别如下。
+         * 第一种：目的是优先保障重要来源的流量，我们需要区分调用来源，将限流规则细化。
+         * 对A应用配置500QPS，对B应用配置200QPS，此时会产生两条规则：A应用请求的流量限制在500，B应用请求的流量限制在200
+         *
+         * 第二种：没有特别重要来源的配置。我们不想区分调用来源，所有入口调用UserService共享一个规则，所有client加起来总流量只能通过1000QPS
+         *
+         * 第三种：配合第一种场景使用，在长尾应用多的情况下不想对每个应用进行设置，没有具体设置的应用都将命中。
+         */
         return null;
     }
 

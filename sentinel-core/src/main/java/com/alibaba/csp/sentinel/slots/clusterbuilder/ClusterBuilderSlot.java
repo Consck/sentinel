@@ -37,10 +37,12 @@ import com.alibaba.csp.sentinel.spi.SpiOrder;
  * This slot maintains resource running statistics (response time, qps, thread
  * count, exception), and a list of callers as well which is marked by
  * {@link ContextUtil#enter(String origin)}
+ * 这个插槽维护资源运行统计信息(响应时间、qps、线程计数、异常)，以及用enter标记的调用者列表
  * </p>
  * <p>
  * One resource has only one cluster node, while one resource can have multiple
  * default nodes.
+ * 一个资源只有一个集群节点，而一个资源可以有多个默认节点。
  * </p>
  *
  * @author jialiang.linjl
@@ -64,6 +66,8 @@ public class ClusterBuilderSlot extends AbstractLinkedProcessorSlot<DefaultNode>
      * The longer the application runs, the more stable this mapping will
      * become. so we don't concurrent map but a lock. as this lock only happens
      * at the very beginning while concurrent map will hold the lock all the time.
+     * 应用程序运行的时间越长，这个映射就会变得越稳定。所以我们不是并发映射，而是锁。因为这个锁只发生在最开始的时候，
+     * 而并发映射将一直持有这个锁。
      * </p>
      */
     private static volatile Map<ResourceWrapper, ClusterNode> clusterNodeMap = new HashMap<>();

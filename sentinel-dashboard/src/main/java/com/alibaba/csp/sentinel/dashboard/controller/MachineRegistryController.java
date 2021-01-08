@@ -39,6 +39,17 @@ public class MachineRegistryController {
     @Autowired
     private AppManagement appManagement;
 
+    /**
+     * 客户端发送心跳消息，就是通过http请求这个方法,将客户端信息注册到控制台
+     * @param app
+     * @param appType
+     * @param version
+     * @param v
+     * @param hostname
+     * @param ip
+     * @param port
+     * @return
+     */
     @ResponseBody
     @RequestMapping("/machine")
     public Result<?> receiveHeartBeat(String app, @RequestParam(value = "app_type", required = false, defaultValue = "0") Integer appType, Long version, String v, String hostname, String ip, Integer port) {

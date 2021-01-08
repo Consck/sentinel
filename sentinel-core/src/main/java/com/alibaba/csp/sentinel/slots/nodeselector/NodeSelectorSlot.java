@@ -30,6 +30,7 @@ import java.util.Map;
 /**
  * </p>
  * This class will try to build the calling traces via
+ * 这个类将尝试构建调用跟踪
  * <ol>
  * <li>adding a new {@link DefaultNode} if needed as the last child in the context.
  * The context's last node is the current node or the parent node of the context. </li>
@@ -151,6 +152,13 @@ public class NodeSelectorSlot extends AbstractLinkedProcessorSlot<Object> {
          * so what is the fastest way to get total statistics of the same resource?
          * The answer is all {@link DefaultNode}s with same resource name share one
          * {@link ClusterNode}. See {@link ClusterBuilderSlot} for detail.
+         *
+         * 有趣的是，我们使用上下文名而不是资源名作为映射键。请记住，无论在什么上下文中，相同的资源ResourceWrapper将全局地共享相同的ProcessorSlotChain。
+         * 因此，如果代码进入entry(Context, ResourceWrapper, DefaultNode, int, Object…)}，资源名称必须是相同的，但上下文名称可以不一样。
+         * 如果我们使用SphU在不同的上下文中输入相同的资源，那么使用上下文名作为映射键可以区分相同的资源。
+         * 在本例中，将为每个不同的上下文(不同的上下文名称)创建具有相同资源名的多个DefaultNode。
+         * 考虑另一个问题。一个资源可能有多个DefaultNode，那么获得相同资源的总统计信息的最快方法是什么?
+         * 答案是所有具有相同资源名的DefaultNode共享一个ClusterNode。有关详细信息，请参见ClusterBuilderSlot。
          */
         DefaultNode node = map.get(context.getName());
         if (node == null) {

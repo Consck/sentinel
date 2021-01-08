@@ -19,6 +19,7 @@ import com.alibaba.csp.sentinel.context.Context;
 
 /**
  * A container of some process and ways of notification when the process is finished.
+ * 某个流程的容器以及流程完成时的通知方式。
  *
  * @author qinan.qn
  * @author jialiang.linjl

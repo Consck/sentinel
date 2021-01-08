@@ -32,6 +32,7 @@ public class ParamFlowStatisticEntryCallback implements ProcessorSlotEntryCallba
     @Override
     public void onPass(Context context, ResourceWrapper resourceWrapper, DefaultNode node, int count, Object... args) {
         // The "hot spot" parameter metric is present only if parameter flow rules for the resource exist.
+        // 只有当资源的参数流规则存在时，才会出现“热点”参数度量。
         ParameterMetric parameterMetric = ParameterMetricStorage.getParamMetric(resourceWrapper);
 
         if (parameterMetric != null) {
@@ -44,5 +45,7 @@ public class ParamFlowStatisticEntryCallback implements ProcessorSlotEntryCallba
                           int count, Object... args) {
         // Here we don't add block count here because checking the type of block exception can affect performance.
         // We add the block count when throwing the ParamFlowException instead.
+        //这里我们没有添加块计数，因为检查块异常的类型会影响性能。
+        //我们在抛出ParamFlowException时添加块计数。
     }
 }

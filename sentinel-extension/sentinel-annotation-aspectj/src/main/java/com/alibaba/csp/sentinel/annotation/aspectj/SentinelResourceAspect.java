@@ -49,8 +49,8 @@ public class SentinelResourceAspect extends AbstractSentinelAspectSupport {
             throw new IllegalStateException("Wrong state for SentinelResource annotation");
         }
         String resourceName = getResourceName(annotation.value(), originMethod);
-        EntryType entryType = annotation.entryType();
-        int resourceType = annotation.resourceType();
+        EntryType entryType = annotation.entryType();//默认为out
+        int resourceType = annotation.resourceType();//默认为0
         Entry entry = null;
         try {
             entry = SphU.entry(resourceName, resourceType, entryType, pjp.getArgs());

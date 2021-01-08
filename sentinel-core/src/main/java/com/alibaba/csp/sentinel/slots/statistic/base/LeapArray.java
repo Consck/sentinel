@@ -26,6 +26,7 @@ import com.alibaba.csp.sentinel.util.TimeUtil;
 /**
  * <p>
  * Basic data structure for statistic metrics in Sentinel.
+ * Sentinel中统计度量的基本数据结构。
  * </p>
  * <p>
  * Leap array use sliding window algorithm to count data. Each bucket cover {@code windowLengthInMs} time span,
@@ -39,29 +40,34 @@ import com.alibaba.csp.sentinel.util.TimeUtil;
  * @author Carpenter Lee
  */
 public abstract class LeapArray<T> {
-
+    //单个窗口的长度(1个窗口多长时间)
     protected int windowLengthInMs;
+    //采样窗口的个数
     protected int sampleCount;
+    //全部窗口的长度(全部窗口多长时间)
     protected int intervalInMs;
-
+    //存储所有窗口(支持原子读取和写入)
     protected final AtomicReferenceArray<WindowWrap<T>> array;
 
     /**
      * The conditional (predicate) update lock is used only when current bucket is deprecated.
+     * 重置窗口数据时用的锁
      */
     private final ReentrantLock updateLock = new ReentrantLock();
 
     /**
      * The total bucket count is: {@code sampleCount = intervalInMs / windowLengthInMs}.
-     *
+     * 总桶数为:
      * @param sampleCount  bucket count of the sliding window
+     *                     桶计数的滑动窗口
      * @param intervalInMs the total time interval of this {@link LeapArray} in milliseconds
+     *                     这个{@link LeapArray}的总时间间隔，以毫秒为单位
      */
     public LeapArray(int sampleCount, int intervalInMs) {
         AssertUtil.isTrue(sampleCount > 0, "bucket count is invalid: " + sampleCount);
         AssertUtil.isTrue(intervalInMs > 0, "total time interval of the sliding window should be positive");
         AssertUtil.isTrue(intervalInMs % sampleCount == 0, "time span needs to be evenly divided");
-
+        //计算单个窗口的长度
         this.windowLengthInMs = intervalInMs / sampleCount;
         this.intervalInMs = intervalInMs;
         this.sampleCount = sampleCount;
@@ -71,7 +77,7 @@ public abstract class LeapArray<T> {
 
     /**
      * Get the bucket at current timestamp.
-     *
+     * 获取当前窗口
      * @return the bucket at current timestamp
      */
     public WindowWrap<T> currentWindow() {
@@ -94,20 +100,23 @@ public abstract class LeapArray<T> {
      * @return new clean bucket at given start time
      */
     protected abstract WindowWrap<T> resetWindowTo(WindowWrap<T> windowWrap, long startTime);
-
+    //计算索引
     private int calculateTimeIdx(/*@Valid*/ long timeMillis) {
+        //timeId把时间降精度
         long timeId = timeMillis / windowLengthInMs;
         // Calculate current index so we can map the timestamp to the leap array.
+        //取模计算索引值，取值为[0, array.length() -1]
         return (int)(timeId % array.length());
     }
-
+    //计算窗口开始时间
     protected long calculateWindowStart(/*@Valid*/ long timeMillis) {
+        //按窗口长度降精度，让1个窗口长度内从任意时间点开始都相同
         return timeMillis - timeMillis % windowLengthInMs;
     }
 
     /**
      * Get bucket item at provided timestamp.
-     *
+     * 获取指定时间窗口
      * @param timeMillis a valid timestamp in milliseconds
      * @return current bucket item at provided timestamp if the time is valid; null if time is invalid
      */
@@ -115,19 +124,25 @@ public abstract class LeapArray<T> {
         if (timeMillis < 0) {
             return null;
         }
-
+        //根据时间计算索引
         int idx = calculateTimeIdx(timeMillis);
         // Calculate current bucket start time.
+        //根据时间计算窗口开始时间
         long windowStart = calculateWindowStart(timeMillis);
 
         /*
          * Get bucket item at given time from the array.
-         *
+         * 从array中获取窗口，有3种情况
          * (1) Bucket is absent, then just create a new bucket and CAS update to circular array.
+         * array中窗口不存在，创建一个CAS并写入array
          * (2) Bucket is up-to-date, then just return the bucket.
+         * array中窗口开始时间 = 当前窗口开始时间，直接返回
          * (3) Bucket is deprecated, then reset current bucket and clean all deprecated buckets.
+         * array窗口开始时间 < 当前窗口开始时间，表示old窗口已经过期，重置窗口数据并返回
+         *
          */
         while (true) {
+            //从array中获取窗口
             WindowWrap<T> old = array.get(idx);
             if (old == null) {
                 /*
@@ -142,11 +157,14 @@ public abstract class LeapArray<T> {
                  * then try to update circular array via a CAS operation. Only one thread can
                  * succeed to update, while other threads yield its time slice.
                  */
+                //创建一个窗口
                 WindowWrap<T> window = new WindowWrap<T>(windowLengthInMs, windowStart, newEmptyBucket(timeMillis));
+                //CAS将新窗口写到array中并返回
                 if (array.compareAndSet(idx, null, window)) {
                     // Successfully updated, return the created bucket.
                     return window;
                 } else {
+                    //并发写失败，释放CPU资源，避免有线程长时间占用CPU，一般下次来的时候array中有数据了会命中第二种情况
                     // Contention failed, the thread will yield its time slice to wait for bucket available.
                     Thread.yield();
                 }
@@ -162,6 +180,7 @@ public abstract class LeapArray<T> {
                  * If current {@code windowStart} is equal to the start timestamp of old bucket,
                  * that means the time is within the bucket, so directly return the bucket.
                  */
+                //在第一种或第三种情况下，多数并发失败会命中这种情况
                 return old;
             } else if (windowStart > old.windowStart()) {
                 /*
@@ -181,19 +200,24 @@ public abstract class LeapArray<T> {
                  * The update lock is conditional (tiny scope) and will take effect only when
                  * bucket is deprecated, so in most cases it won't lead to performance loss.
                  */
+                //加锁去重置
                 if (updateLock.tryLock()) {
                     try {
                         // Successfully get the update lock, now we reset the bucket.
+                        //拿到锁的线程才重置窗口
                         return resetWindowTo(old, windowStart);
                     } finally {
+                        //释放锁
                         updateLock.unlock();
                     }
                 } else {
                     // Contention failed, the thread will yield its time slice to wait for bucket available.
+                    //并发加锁失败，释放CPU资源，避免有线程长时间占用CPU，一般下次来的时候因为old对象时间更新了会命中第二种情况
                     Thread.yield();
                 }
             } else if (windowStart < old.windowStart()) {
                 // Should not go through here, as the provided time is already behind.
+                //理论上不会出现的情况
                 return new WindowWrap<T>(windowLengthInMs, windowStart, newEmptyBucket(timeMillis));
             }
         }

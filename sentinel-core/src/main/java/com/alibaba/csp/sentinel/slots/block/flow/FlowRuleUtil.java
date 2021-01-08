@@ -78,7 +78,7 @@ public final class FlowRuleUtil {
 
     /**
      * Build the flow rule map from raw list of flow rules, grouping by provided group function.
-     *
+     *  从流规则的原始列表构建流规则映射，按提供的组函数进行分组。
      * @param list          raw list of flow rules
      * @param groupFunction grouping function of the map (by key)
      * @param filter        rule filter

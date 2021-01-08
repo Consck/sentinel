@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * The universal local configuration center of Sentinel. The config is retrieved from command line arguments
  * and customized properties file by default.
- *
+ * 哨兵的通用本地配置中心。默认情况下，从命令行参数和自定义属性文件中检索配置。
  * @author leyou
  * @author Eric Zhao
  * @author Lin Liang
@@ -94,9 +94,12 @@ public final class SentinelConfig {
     private static void initialize() {
         // Init default properties.
         setConfig(CHARSET, DEFAULT_CHARSET);
+        //qps的令牌桶中令牌产生的速度
         setConfig(SINGLE_METRIC_FILE_SIZE, String.valueOf(DEFAULT_SINGLE_METRIC_FILE_SIZE));
         setConfig(TOTAL_METRIC_FILE_COUNT, String.valueOf(DEFAULT_TOTAL_METRIC_FILE_COUNT));
+        //qps的令牌桶中令牌产生的速度
         setConfig(COLD_FACTOR, String.valueOf(DEFAULT_COLD_FACTOR));
+        //从获取令牌（entry）到释放的响应时间
         setConfig(STATISTIC_MAX_RT, String.valueOf(DEFAULT_STATISTIC_MAX_RT));
     }
 

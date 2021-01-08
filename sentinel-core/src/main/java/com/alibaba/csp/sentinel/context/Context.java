@@ -39,13 +39,16 @@ import com.alibaba.csp.sentinel.slots.nodeselector.NodeSelectorSlot;
  * <p>
  * Each {@link SphU}#entry() or {@link SphO}#entry() should be in a {@link Context},
  * if we don't invoke {@link ContextUtil}#enter() explicitly, DEFAULT context will be used.
+ * 每个{@link SphU} entry()或{@link SphO}#entry()应该在{@link上下文}中，如果我们不显式地调用{@link Context tutil}#enter()，将使用默认上下文。
  * </p>
  * <p>
  * A invocation tree will be created if we invoke {@link SphU}#entry() multi times in
  * the same context.
+ * 如果我们在同一上下文中多次调用{@link SphU}#entry()，就会创建一个调用树。
  * </p>
  * <p>
  * Same resource in different context will count separately, see {@link NodeSelectorSlot}.
+ * 不同上下文中的相同资源将单独计算
  * </p>
  *
  * @author jialiang.linjl
@@ -63,16 +66,19 @@ public class Context {
 
     /**
      * The entrance node of current invocation tree.
+     * 当前调用树的入口节点
      */
     private DefaultNode entranceNode;
 
     /**
      * Current processing entry.
+     * 当前处理条目。
      */
     private Entry curEntry;
 
     /**
      * The origin of this context (usually indicate different invokers, e.g. service consumer name or origin IP).
+     * 此上下文的起源(通常表示不同的调用者，例如服务使用者名或起源IP)。
      */
     private String origin = "";
 
@@ -80,8 +86,9 @@ public class Context {
 
     /**
      * Create a new async context.
+     * 创建一个新的async上下文。
      *
-     * @param entranceNode entrance node of the context
+     * @param entranceNode entrance node of the context 入口节点的上下文
      * @param name context name
      * @return the new created context
      * @since 0.2.0

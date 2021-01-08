@@ -157,6 +157,18 @@ public class FlowSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
         this.checker = checker;
     }
 
+    /**
+     * chain.entry方法会经过FlowSlot中的entry(),调用checkFlow进行流控规则判断
+     * 第一步：遍历所有流控规则FlowRule
+     * 第二步：针对每个规则，调用canPassCheck进行校验
+     * @param context         current {@link Context}
+     * @param resourceWrapper current resource
+     * @param node
+     * @param count           tokens needed
+     * @param prioritized     whether the entry is prioritized 是否有优先级
+     * @param args            parameters of the original call
+     * @throws Throwable
+     */
     @Override
     public void entry(Context context, ResourceWrapper resourceWrapper, DefaultNode node, int count,
                       boolean prioritized, Object... args) throws Throwable {
@@ -164,7 +176,7 @@ public class FlowSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
 
         fireEntry(context, resourceWrapper, node, count, prioritized, args);
     }
-
+    //限流检测
     void checkFlow(ResourceWrapper resource, Context context, DefaultNode node, int count, boolean prioritized)
         throws BlockException {
         checker.checkFlow(ruleProvider, resource, context, node, count, prioritized);
@@ -174,7 +186,7 @@ public class FlowSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
     public void exit(Context context, ResourceWrapper resourceWrapper, int count, Object... args) {
         fireExit(context, resourceWrapper, count, args);
     }
-
+    //获取流控规则
     private final Function<String, Collection<FlowRule>> ruleProvider = new Function<String, Collection<FlowRule>>() {
         @Override
         public Collection<FlowRule> apply(String resource) {

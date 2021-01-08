@@ -67,6 +67,7 @@ public class FlowRuleManager {
      * @param property the property to listen.
      */
     public static void register2Property(SentinelProperty<List<FlowRule>> property) {
+        //Apollo限流规则进入此方法
         AssertUtil.notNull(property, "property cannot be null");
         synchronized (LISTENER) {
             RecordLog.info("[FlowRuleManager] Registering new property to flow rule manager");
@@ -99,6 +100,7 @@ public class FlowRuleManager {
     }
 
     static Map<String, List<FlowRule>> getFlowRuleMap() {
+        //限流FlowSlot获取所有的限流规则
         return flowRules;
     }
 

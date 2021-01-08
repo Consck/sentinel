@@ -69,14 +69,14 @@ import com.alibaba.csp.sentinel.slots.system.SystemRule;
  * @see SphO
  */
 public class SphU {
-
+    //限流的判断逻辑是在entry实现，往下执行最终会进入Sph.entry()，Sph的默认实现是CtSph
     private static final Object[] OBJECTS0 = new Object[0];
 
     private SphU() {}
 
     /**
      * Record statistics and perform rule checking for the given resource.
-     *
+     * 记录统计信息并执行给定资源的规则检查
      * @param name the unique name of the protected resource
      * @return the {@link Entry} of this invocation (used for mark the invocation complete and get context data)
      * @throws BlockException if the block criteria is met (e.g. metric exceeded the threshold of any rules)
@@ -301,6 +301,7 @@ public class SphU {
      * @param trafficType  the traffic type (inbound, outbound or internal). This is used
      *                     to mark whether it can be blocked when the system is unstable,
      *                     only inbound traffic could be blocked by {@link SystemRule}
+     *                     流量类型(入站、出站或内部)。用于标记系统不稳定时是否可以阻塞，只有入站流量可以被{@link SystemRule}阻塞
      * @param resourceType classification of the resource (e.g. Web or RPC)
      * @param args         args for parameter flow control or customized slots
      * @return the {@link Entry} of this invocation (used for mark the invocation complete and get context data)

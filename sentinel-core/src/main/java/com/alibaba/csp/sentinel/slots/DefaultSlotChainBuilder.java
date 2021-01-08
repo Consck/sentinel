@@ -30,6 +30,7 @@ import java.util.List;
  *
  * @author qinan.qn
  * @author leyou
+ * 默认槽链构建器
  */
 public class DefaultSlotChainBuilder implements SlotChainBuilder {
 
@@ -37,10 +38,13 @@ public class DefaultSlotChainBuilder implements SlotChainBuilder {
     public ProcessorSlotChain build() {
         ProcessorSlotChain chain = new DefaultProcessorSlotChain();
 
-        // Note: the instances of ProcessorSlot should be different, since they are not stateless.
+        // Note: the instances of Processor
+        //Slot should be different, since they are not stateless.
+        // ProcessorSlot的实例应该是不同的，因为它们不是无状态的。
         List<ProcessorSlot> sortedSlotList = SpiLoader.loadPrototypeInstanceListSorted(ProcessorSlot.class);
         for (ProcessorSlot slot : sortedSlotList) {
             if (!(slot instanceof AbstractLinkedProcessorSlot)) {
+                // 不是AbstractLinkedProcessorSlot的实例，不能添加到ProcessorSlotChain中
                 RecordLog.warn("The ProcessorSlot(" + slot.getClass().getCanonicalName() + ") is not an instance of AbstractLinkedProcessorSlot, can't be added into ProcessorSlotChain");
                 continue;
             }

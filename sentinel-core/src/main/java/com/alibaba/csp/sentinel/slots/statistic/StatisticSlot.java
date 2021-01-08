@@ -34,6 +34,7 @@ import com.alibaba.csp.sentinel.slots.block.BlockException;
 
 /**
  * <p>
+ * 限流的核心是限流算法的实现，Sentinel默认采用滑动窗口算法来实现限流，具体的指标数据统计由StatisticSlot实现
  * A processor slot that dedicates to real time statistics.
  * When entering this slot, we need to separately count the following
  * information:
@@ -56,18 +57,22 @@ public class StatisticSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
                       boolean prioritized, Object... args) throws Throwable {
         try {
             // Do some checking.
+            /**
+             * 先执行后续Slot检查，再统计数据
+             */
             fireEntry(context, resourceWrapper, node, count, prioritized, args);
 
             // Request passed, add thread count and pass count.
+            //增加线程数和请求通过数
             node.increaseThreadNum();
             node.addPassRequest(count);
-
+            //如果存在来源节点，则对来源节点增加线程数和请求通过数
             if (context.getCurEntry().getOriginNode() != null) {
                 // Add count for origin node.
                 context.getCurEntry().getOriginNode().increaseThreadNum();
                 context.getCurEntry().getOriginNode().addPassRequest(count);
             }
-
+            //如果是入口流量，则对全局节点增加线程数和请求通过数
             if (resourceWrapper.getEntryType() == EntryType.IN) {
                 // Add count for global inbound entry node for global statistics.
                 Constants.ENTRY_NODE.increaseThreadNum();
@@ -75,25 +80,31 @@ public class StatisticSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
             }
 
             // Handle pass event with registered entry callback handlers.
+            //执行事件通知和回调函数
             for (ProcessorSlotEntryCallback<DefaultNode> handler : StatisticSlotCallbackRegistry.getEntryCallbacks()) {
                 handler.onPass(context, resourceWrapper, node, count, args);
             }
         } catch (PriorityWaitException ex) {
+            //处理优先级等待异常
+            //这里只增加线程数
             node.increaseThreadNum();
+            //如果有来源节点，则对来源节点增加线程数
             if (context.getCurEntry().getOriginNode() != null) {
                 // Add count for origin node.
                 context.getCurEntry().getOriginNode().increaseThreadNum();
             }
-
+            //如果是入口流量，对全局节点增加线程数
             if (resourceWrapper.getEntryType() == EntryType.IN) {
                 // Add count for global inbound entry node for global statistics.
                 Constants.ENTRY_NODE.increaseThreadNum();
             }
             // Handle pass event with registered entry callback handlers.
+            //执行时间通知和回调函数
             for (ProcessorSlotEntryCallback<DefaultNode> handler : StatisticSlotCallbackRegistry.getEntryCallbacks()) {
                 handler.onPass(context, resourceWrapper, node, count, args);
             }
         } catch (BlockException e) {
+            //处理限流、降级等异常
             // Blocked, set block exception to current entry.
             context.getCurEntry().setBlockError(e);
 

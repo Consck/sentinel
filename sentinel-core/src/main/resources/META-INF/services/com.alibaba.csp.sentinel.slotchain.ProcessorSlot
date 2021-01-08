@@ -1,9 +1,16 @@
 # Sentinel default ProcessorSlots
+# 调用链路构建
 com.alibaba.csp.sentinel.slots.nodeselector.NodeSelectorSlot
+# 统计簇点构建
 com.alibaba.csp.sentinel.slots.clusterbuilder.ClusterBuilderSlot
 com.alibaba.csp.sentinel.slots.logger.LogSlot
+# 监控统计
 com.alibaba.csp.sentinel.slots.statistic.StatisticSlot
+# 来源访问控制
 com.alibaba.csp.sentinel.slots.block.authority.AuthoritySlot
+# 系统保护
 com.alibaba.csp.sentinel.slots.system.SystemSlot
+# 流量控制
 com.alibaba.csp.sentinel.slots.block.flow.FlowSlot
+# 熔断降级
 com.alibaba.csp.sentinel.slots.block.degrade.DegradeSlot

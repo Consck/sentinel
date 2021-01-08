@@ -21,6 +21,7 @@ import com.alibaba.csp.sentinel.util.SpiLoader;
 
 /**
  * A provider for creating slot chains via resolved slot chain builder SPI.
+ * 通过解析的槽链构建器SPI创建槽链的提供程序。
  *
  * @author Eric Zhao
  * @since 0.2.0
@@ -48,6 +49,7 @@ public final class SlotChainProvider {
             RecordLog.warn("[SlotChainProvider] Wrong state when resolving slot chain builder, using default");
             slotChainBuilder = new DefaultSlotChainBuilder();
         } else {
+            //日志记录到哪里了
             RecordLog.info("[SlotChainProvider] Global slot chain builder resolved: "
                 + slotChainBuilder.getClass().getCanonicalName());
         }

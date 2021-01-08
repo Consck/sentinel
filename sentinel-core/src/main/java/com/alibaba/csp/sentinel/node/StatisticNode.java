@@ -88,9 +88,15 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author jialiang.linjl
  */
 public class StatisticNode implements Node {
+    /**
+     * StatisticNode持有两个计数器Metric对象，统计行为是通过Metric完成的
+     * Metric是一个指标行为接口，定义了资源各个指标的统计方法和获取方法，Metric接口的具体实现是ArrayMetric类
+     * StatisticNode中的统计行为是由滑动计数器ArrayMetric完成的
+     */
 
     /**
      * Holds statistics of the recent {@code INTERVAL} seconds. The {@code INTERVAL} is divided into time spans
+     * 最近1秒滑动计数器(默认为1秒)
      * by given {@code sampleCount}.
      */
     private transient volatile Metric rollingCounterInSecond = new ArrayMetric(SampleCountProperty.SAMPLE_COUNT,
@@ -99,6 +105,7 @@ public class StatisticNode implements Node {
     /**
      * Holds statistics of the recent 60 seconds. The windowLengthInMs is deliberately set to 1000 milliseconds,
      * meaning each bucket per second, in this way we can get accurate statistics of each second.
+     * 最近1分钟滑动计数器(默认为1分钟)
      */
     private transient Metric rollingCounterInMinute = new ArrayMetric(60, 60 * 1000, false);
 
@@ -242,12 +249,14 @@ public class StatisticNode implements Node {
         return (int)curThreadNum.sum();
     }
 
+    //加通过数
     @Override
     public void addPassRequest(int count) {
         rollingCounterInSecond.addPass(count);
         rollingCounterInMinute.addPass(count);
     }
 
+    //加RT和成功数
     @Override
     public void addRtAndSuccess(long rt, int successCount) {
         rollingCounterInSecond.addSuccess(successCount);
@@ -300,6 +309,8 @@ public class StatisticNode implements Node {
          * Note: here {@code currentPass} may be less than it really is NOW, because time difference
          * since call rollingCounterInSecond.pass(). So in high concurrency, the following code may
          * lead more tokens be borrowed.
+         * 注意:这里的{@code currentPass}可能比现在的实际值要小，因为调用rollingCounterInSecond.pass()之后的时差。
+         * 因此，在高并发性中，下面的代码可能会导致更多的令牌被借用。
          */
         long currentPass = rollingCounterInSecond.pass();
         while (earliestTime < currentTime) {

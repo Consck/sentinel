@@ -116,6 +116,7 @@ public class CtSph implements Sph {
 
     private Entry entryWithPriority(ResourceWrapper resourceWrapper, int count, boolean prioritized, Object... args)
         throws BlockException {
+        //第一步：校验全局上下文
         Context context = ContextUtil.getContext();
         if (context instanceof NullContext) {
             // The {@link NullContext} indicates that the amount of context has exceeded the threshold,
@@ -132,7 +133,7 @@ public class CtSph implements Sph {
         if (!Constants.ON) {
             return new CtEntry(resourceWrapper, null, context);
         }
-
+        //第二步：通过lookProcessChasin方法获得一个ProcessorSlot链
         ProcessorSlot<Object> chain = lookProcessChain(resourceWrapper);
 
         /*
@@ -145,6 +146,7 @@ public class CtSph implements Sph {
 
         Entry e = new CtEntry(resourceWrapper, chain, context);
         try {
+            //第三步：执行chain.entry，如果没有被限流，则返回entry对象，否则抛出BlockException
             chain.entry(context, resourceWrapper, null, count, prioritized, args);
         } catch (BlockException e1) {
             e.exit(count, args);
@@ -179,14 +181,18 @@ public class CtSph implements Sph {
     /**
      * Get {@link ProcessorSlotChain} of the resource. new {@link ProcessorSlotChain} will
      * be created if the resource doesn't relate one.
+     * 获取资源的{@link ProcessorSlotChain}。如果资源没有关联，将创建新的{@link ProcessorSlotChain}。
      *
      * <p>Same resource({@link ResourceWrapper#equals(Object)}) will share the same
      * {@link ProcessorSlotChain} globally, no matter in witch {@link Context}.<p/>
+     * 相同的资源({@link ResourceWrapper#equals(Object)})将在全局上共享相同的{@link ProcessorSlotChain}，无论在哪个{@link上下文中}中。
      *
      * <p>
      * Note that total {@link ProcessorSlot} count must not exceed {@link Constants#MAX_SLOT_CHAIN_SIZE},
      * otherwise null will return.
      * </p>
+     *
+     * 注意，总数{@link ProcessorSlot}不能超过{@link Constants#MAX_SLOT_CHAIN_SIZE}，否则将返回null。
      *
      * @param resourceWrapper target resource
      * @return {@link ProcessorSlotChain} of the resource
@@ -201,7 +207,9 @@ public class CtSph implements Sph {
                     if (chainMap.size() >= Constants.MAX_SLOT_CHAIN_SIZE) {
                         return null;
                     }
-
+                    //构造一个Slot链。典型的责任链模式，其中每一个Slot的作用都有分析。
+                    //对于限流，只需要关注FlowSlot和StatisticSlot
+                    //其中StatisticSlot实现指标数据的统计，FlowSlot依赖该数据来进行流控规则校验
                     chain = SlotChainProvider.newSlotChain();
                     Map<ResourceWrapper, ProcessorSlotChain> newMap = new HashMap<ResourceWrapper, ProcessorSlotChain>(
                         chainMap.size() + 1);

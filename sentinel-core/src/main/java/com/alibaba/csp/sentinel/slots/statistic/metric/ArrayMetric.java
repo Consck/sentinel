@@ -34,13 +34,18 @@ import com.alibaba.csp.sentinel.util.function.Predicate;
  * @author Eric Zhao
  */
 public class ArrayMetric implements Metric {
-
+    /**
+     * ArrayMetric持有LeapArray对象，所有方法都是对LeapArray进行操作。
+     * LeapArray是环形的数据结构，为了节约内存，它存储固定个数的窗口对象WindowWrap
+     * 只保存最近一段时间的数据，新增的时间窗口会覆盖最早的时间窗口
+     */
+    //数据存储
     private final LeapArray<MetricBucket> data;
-
+    //最近1秒滑动计数器用的是OccupiableBucketLeapArray
     public ArrayMetric(int sampleCount, int intervalInMs) {
         this.data = new OccupiableBucketLeapArray(sampleCount, intervalInMs);
     }
-
+    //最近1分钟滑动计数器用的是BucketLeapArray
     public ArrayMetric(int sampleCount, int intervalInMs, boolean enableOccupy) {
         if (enableOccupy) {
             this.data = new OccupiableBucketLeapArray(sampleCount, intervalInMs);
@@ -232,19 +237,19 @@ public class ArrayMetric implements Metric {
         WindowWrap<MetricBucket> wrap = data.currentWindow();
         wrap.value().addOccupiedPass(acquireCount);
     }
-
+    //加成功数
     @Override
     public void addSuccess(int count) {
         WindowWrap<MetricBucket> wrap = data.currentWindow();
         wrap.value().addSuccess(count);
     }
-
+    //加通过数
     @Override
     public void addPass(int count) {
         WindowWrap<MetricBucket> wrap = data.currentWindow();
         wrap.value().addPass(count);
     }
-
+    //加RT
     @Override
     public void addRT(long rt) {
         WindowWrap<MetricBucket> wrap = data.currentWindow();
