@@ -41,6 +41,16 @@ import com.alibaba.csp.sentinel.util.function.Function;
  */
 public class FlowRuleChecker {
 
+    /**
+     * FlowSlot判断请求是否pass
+     * @param ruleProvider
+     * @param resource
+     * @param context
+     * @param node
+     * @param count
+     * @param prioritized
+     * @throws BlockException
+     */
     public void checkFlow(Function<String, Collection<FlowRule>> ruleProvider, ResourceWrapper resource,
                           Context context, DefaultNode node, int count, boolean prioritized) throws BlockException {
         if (ruleProvider == null || resource == null) {

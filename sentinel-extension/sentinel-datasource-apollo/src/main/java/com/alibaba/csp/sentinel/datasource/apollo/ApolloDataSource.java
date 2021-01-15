@@ -18,7 +18,7 @@ import com.google.common.collect.Sets;
  * source.
  * <br />
  * When the rule is changed in Apollo, it will take effect in real time.
- *
+ * 读入Apollo限流规则
  * @author Jason Song
  * @author Haojun Ren
  */

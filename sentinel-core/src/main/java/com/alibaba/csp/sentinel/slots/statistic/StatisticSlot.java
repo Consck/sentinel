@@ -116,10 +116,12 @@ public class StatisticSlot extends AbstractLinkedProcessorSlot<DefaultNode> {
 
             if (resourceWrapper.getEntryType() == EntryType.IN) {
                 // Add count for global inbound entry node for global statistics.
+                //为全局统计添加全局入站入口节点的计数。
                 Constants.ENTRY_NODE.increaseBlockQps(count);
             }
 
             // Handle block event with registered entry callback handlers.
+            //用已注册的条目回调处理程序处理块事件。
             for (ProcessorSlotEntryCallback<DefaultNode> handler : StatisticSlotCallbackRegistry.getEntryCallbacks()) {
                 handler.onBlocked(e, context, resourceWrapper, node, count, args);
             }

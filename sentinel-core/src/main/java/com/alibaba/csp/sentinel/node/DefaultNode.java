@@ -57,6 +57,7 @@ public class DefaultNode extends StatisticNode {
     /**
      * Associated cluster node.
      * 相关的集群节点。
+     * 保存某个resource在所有context中实时指标的总和
      */
     private ClusterNode clusterNode;
 

@@ -28,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <p>The statistic node keep three kinds of real-time statistics metrics:</p>
+ * 统计节点保存三种实时统计指标
  * <ol>
  * <li>metrics in second level ({@code rollingCounterInSecond})</li>
  * <li>metrics in minute level ({@code rollingCounterInMinute})</li>
@@ -36,13 +37,17 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <p>
  * Sentinel use sliding window to record and count the resource statistics in real-time.
+ * Sentinel使用滑动窗口实时记录和计数资源统计。
  * The sliding window infrastructure behind the {@link ArrayMetric} is {@code LeapArray}.
+ * {@link ArrayMetric}背后的滑动窗口基础结构是{@code LeapArray}。
  * </p>
  *
  * <p>
  * case 1: When the first request comes in, Sentinel will create a new window bucket of
  * a specified time-span to store running statics, such as total response time(rt),
  * incoming request(QPS), block request(bq), etc. And the time-span is defined by sample count.
+ * 当第一个请求传入时，Sentinel将创建一个指定时间范围的新窗口桶来存储运行中的静态信息，
+ * 如总响应时间(rt)、传入请求(QPS)、块请求(bq)等。时间跨度由样本计数来定义。
  * </p>
  * <pre>
  * 	0      100ms
@@ -55,6 +60,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * Sentinel use the statics of the valid buckets to decide whether this request can be passed.
  * For example, if a rule defines that only 100 requests can be passed,
  * it will sum all qps in valid buckets, and compare it to the threshold defined in rule.
+ * Sentinel使用有效存储桶的静态信息来决定是否可以传递此请求。
+ * 例如，如果一个规则定义只能传递100个请求，那么它将对有效桶中的所有qps求和，并将其与规则中定义的阈值进行比较。
  * </p>
  *
  * <p>case 2: continuous requests</p>
@@ -67,6 +74,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * </pre>
  *
  * <p>case 3: requests keeps coming, and previous buckets become invalid</p>
+ * 请求不断地来，以前的存储桶变得无效
  * <pre>
  *  0    100ms    200ms	  800ms	   900ms  1000ms    1300ms
  *  +-------+-------+ ...... +-------+-------+ ...... +-------+-----→ Sliding Windows

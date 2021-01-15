@@ -54,6 +54,7 @@ public class DynamicSentinelProperty<T> implements SentinelProperty<T> {
 
         value = newValue;
         for (PropertyListener<T> listener : listeners) {
+            //将Apollo限流规则存入FlowRuleManager
             listener.configUpdate(newValue);
         }
         return true;

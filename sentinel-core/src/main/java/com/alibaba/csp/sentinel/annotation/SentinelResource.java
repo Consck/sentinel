@@ -21,7 +21,7 @@ import java.lang.annotation.*;
 
 /**
  * The annotation indicates a definition of Sentinel resource.
- *
+ * 限流使用注解
  * @author Eric Zhao
  * @author zhaoyuguang
  * @since 0.1.1

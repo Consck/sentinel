@@ -29,7 +29,7 @@ import java.lang.reflect.Method;
 
 /**
  * Aspect for methods with {@link SentinelResource} annotation.
- *
+ * 注解执行逻辑
  * @author Eric Zhao
  */
 @Aspect
@@ -49,8 +49,10 @@ public class SentinelResourceAspect extends AbstractSentinelAspectSupport {
             throw new IllegalStateException("Wrong state for SentinelResource annotation");
         }
         String resourceName = getResourceName(annotation.value(), originMethod);
-        EntryType entryType = annotation.entryType();//默认为out
-        int resourceType = annotation.resourceType();//默认为0
+        //默认为out
+        EntryType entryType = annotation.entryType();
+        //默认为0
+        int resourceType = annotation.resourceType();
         Entry entry = null;
         try {
             entry = SphU.entry(resourceName, resourceType, entryType, pjp.getArgs());
