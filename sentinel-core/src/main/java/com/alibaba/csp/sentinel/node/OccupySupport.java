@@ -39,7 +39,7 @@ public interface OccupySupport {
      * @param threshold    qps threshold.
      * @return time should sleep. Time >= {@code occupyTimeout} in {@link OccupyTimeoutProperty} means
      * occupy fail, in this case, the request should be rejected immediately.
-     * 时间应该睡觉。Time >= {@link OccupyTimeoutProperty}中的{@code occupyTimeout}表示占用失败，
+     * Time >= {@link OccupyTimeoutProperty}中的{@code occupyTimeout}表示占用失败，
      * 在这种情况下，请求应该立即被拒绝。
      */
     long tryOccupyNext(long currentTime, int acquireCount, double threshold);

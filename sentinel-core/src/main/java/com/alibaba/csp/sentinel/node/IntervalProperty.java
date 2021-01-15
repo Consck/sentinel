@@ -34,8 +34,10 @@ public class IntervalProperty {
     /**
      * <p>Interval in milliseconds. This variable determines sensitivity of the QPS calculation.</p>
      * <p>
+     *     间隔时间,以毫秒为单位。这个变量决定了QPS计算的灵敏度。
      * DO NOT MODIFY this value directly, use {@link #updateInterval(int)}, otherwise the modification will not
      * take effect.
+     * 不要直接修改这个值，使用{@link #updateInterval(int)}，否则修改不会生效。
      * </p>
      */
     public static volatile int INTERVAL = RuleConstant.DEFAULT_WINDOW_INTERVAL_MS;

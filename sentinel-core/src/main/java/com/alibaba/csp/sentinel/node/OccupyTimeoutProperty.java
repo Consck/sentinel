@@ -60,6 +60,7 @@ public class OccupyTimeoutProperty {
      * Update the timeout value.</br>
      * Note that the time out should never greeter than {@link IntervalProperty#INTERVAL},
      * or it will be ignored.
+     * 注意，超时时间不应该大于{@link IntervalProperty#INTERVAL}，否则它将被忽略。
      *
      * @param newInterval new value.
      */

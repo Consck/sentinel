@@ -34,6 +34,7 @@ public class SampleCountProperty {
      * DO NOT MODIFY this value directly, use {@link #updateSampleCount(int)}, otherwise the modification will not
      * take effect.
      * </p>
+     * 统计桶数每秒。这个变量决定了QPS计算的灵敏度。
      * Node that this value must be divisor of 1000.
      */
     public static volatile int SAMPLE_COUNT = 2;
